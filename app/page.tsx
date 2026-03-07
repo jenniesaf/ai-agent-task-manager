@@ -84,63 +84,98 @@ export default function Home() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      pending: 'bg-gray-200 text-gray-700',
-      analyzing: 'bg-blue-200 text-blue-700',
-      ready: 'bg-yellow-200 text-yellow-700',
-      in_progress: 'bg-purple-200 text-purple-700',
-      completed: 'bg-green-200 text-green-700',
-      failed: 'bg-red-200 text-red-700',
-      blocked: 'bg-orange-200 text-orange-700',
+      pending: 'bg-gray-100 text-gray-700 border border-gray-300',
+      analyzing: 'bg-blue-100 text-blue-700 border border-blue-300',
+      ready: 'bg-yellow-100 text-yellow-700 border border-yellow-300',
+      in_progress: 'bg-purple-100 text-purple-700 border border-purple-300',
+      completed: 'bg-green-100 text-green-700 border border-green-300',
+      failed: 'bg-red-100 text-red-700 border border-red-300',
+      blocked: 'bg-orange-100 text-orange-700 border border-orange-300',
     };
-    return colors[status] || 'bg-gray-200 text-gray-700';
+    return colors[status] || 'bg-gray-100 text-gray-700';
   };
 
   const getPriorityColor = (priority: string) => {
     const colors: Record<string, string> = {
-      HIGH: 'text-red-600 font-bold',
-      MEDIUM: 'text-yellow-600',
-      LOW: 'text-gray-500',
+      HIGH: 'bg-red-100 text-red-700 border border-red-300',
+      MEDIUM: 'bg-yellow-100 text-yellow-700 border border-yellow-300',
+      LOW: 'bg-gray-100 text-gray-600 border border-gray-300',
     };
-    return colors[priority] || 'text-gray-500';
+    return colors[priority] || 'bg-gray-100 text-gray-600';
+  };
+
+  const loadDemoTasks = async () => {
+    const demoTasks = [
+      { title: 'Build user authentication', description: 'Complete auth system with login and signup' },
+      { title: 'Create contact form component', description: 'React component with validation' },
+      { title: 'URGENT: Fix homepage button', description: 'Button not responding to clicks' },
+    ];
+
+    for (const task of demoTasks) {
+      await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(task),
+      });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    setTimeout(fetchData, 500);
   };
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            AI Agent Task Manager
-          </h1>
-          <p className="text-gray-600">
-            Watch autonomous agents plan and execute tasks in real-time
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                🤖 AI Agent Task Manager
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Watch autonomous agents plan and execute tasks in real-time
+              </p>
+            </div>
+            <button
+              onClick={loadDemoTasks}
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 font-medium shadow-lg hover:shadow-xl transition-all"
+            >
+              🎬 Load Demo Tasks
+            </button>
+          </div>
         </div>
 
         {/* System Status */}
         {systemStatus && (
-          <div className="bg-white rounded-lg shadow p-6 mb-8">
-            <h2 className="text-xl font-bold mb-4">System Status</h2>
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span className="text-2xl">⚡</span> System Status
+            </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <div className="text-sm text-gray-600">Total Agents</div>
-                <div className="text-2xl font-bold">{systemStatus.agentStats?.total || 0}</div>
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
+                <div className="text-sm text-gray-600 mb-1">Total Agents</div>
+                <div className="text-3xl font-bold text-blue-600">
+                  {systemStatus.agentStats?.total || 0}
+                </div>
               </div>
-              <div>
-                <div className="text-sm text-gray-600">Idle Agents</div>
-                <div className="text-2xl font-bold text-green-600">
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
+                <div className="text-sm text-gray-600 mb-1">Idle Agents</div>
+                <div className="text-3xl font-bold text-green-600">
                   {systemStatus.agentStats?.byStatus?.idle || 0}
                 </div>
               </div>
-              <div>
-                <div className="text-sm text-gray-600">Busy Agents</div>
-                <div className="text-2xl font-bold text-purple-600">
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
+                <div className="text-sm text-gray-600 mb-1">Busy Agents</div>
+                <div className="text-3xl font-bold text-purple-600">
                   {systemStatus.agentStats?.byStatus?.busy || 0}
                 </div>
               </div>
-              <div>
-                <div className="text-sm text-gray-600">Total Tasks</div>
-                <div className="text-2xl font-bold">{systemStatus.taskStats?.total || 0}</div>
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4">
+                <div className="text-sm text-gray-600 mb-1">Total Tasks</div>
+                <div className="text-3xl font-bold text-orange-600">
+                  {systemStatus.taskStats?.total || 0}
+                </div>
               </div>
             </div>
           </div>
@@ -149,8 +184,10 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Create Task */}
           <div>
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h2 className="text-2xl font-bold mb-4">Create Task</h2>
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-100">
+              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span className="text-2xl">✨</span> Create Task
+              </h2>
               <form onSubmit={createTask}>
                 <div className="mb-4">
                   <label className="block text-sm font-medium mb-2">
@@ -160,7 +197,7 @@ export default function Home() {
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="e.g., Build user authentication"
                     required
                   />
@@ -172,7 +209,7 @@ export default function Home() {
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     rows={3}
                     placeholder="Additional details..."
                   />
@@ -180,45 +217,47 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-400 font-medium shadow-lg hover:shadow-xl transition-all"
                 >
-                  {loading ? 'Creating...' : 'Create Task'}
+                  {loading ? '⏳ Creating...' : '🚀 Create Task'}
                 </button>
               </form>
             </div>
 
             {/* Tasks List */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold mb-4">
-                Tasks ({tasks.length})
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span className="text-2xl">📋</span> Tasks ({tasks.length})
               </h2>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {tasks.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">
-                    No tasks yet. Create one above!
-                  </p>
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">📭</div>
+                    <p className="text-gray-500 font-medium">No tasks yet</p>
+                    <p className="text-gray-400 text-sm">Create one above or load demo tasks!</p>
+                  </div>
                 ) : (
                   tasks.map((task) => (
                     <div
                       key={task.id}
-                      className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                      className="border-2 border-gray-100 rounded-lg p-4 hover:shadow-md hover:border-blue-200 transition-all bg-gradient-to-r from-white to-gray-50"
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold">{task.title}</h3>
-                        <span className={`text-xs px-2 py-1 rounded ${getPriorityColor(task.priority)}`}>
+                        <h3 className="font-semibold text-gray-800">{task.title}</h3>
+                        <span className={`text-xs px-3 py-1 rounded-full font-bold ${getPriorityColor(task.priority)}`}>
                           {task.priority}
                         </span>
                       </div>
                       {task.description && (
-                        <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                        <p className="text-sm text-gray-600 mb-3">{task.description}</p>
                       )}
-                      <div className="flex gap-2">
-                        <span className={`text-xs px-2 py-1 rounded ${getStatusColor(task.status)}`}>
+                      <div className="flex gap-2 flex-wrap">
+                        <span className={`text-xs px-3 py-1 rounded-full font-medium ${getStatusColor(task.status)}`}>
                           {task.status}
                         </span>
                         {task.assignedToAgent && (
-                          <span className="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded">
-                            Agent assigned
+                          <span className="text-xs px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full font-medium">
+                            🤖 Agent assigned
                           </span>
                         )}
                       </div>
@@ -231,22 +270,26 @@ export default function Home() {
 
           {/* Right Column - Agent Activity */}
           <div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold mb-4">Agent Activity</h2>
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span className="text-2xl">🔄</span> Agent Activity
+              </h2>
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {logs.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">
-                    No agent activity yet
-                  </p>
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">💤</div>
+                    <p className="text-gray-500 font-medium">No agent activity yet</p>
+                    <p className="text-gray-400 text-sm">Create a task to see agents in action!</p>
+                  </div>
                 ) : (
                   logs.slice().reverse().map((log) => (
                     <div
                       key={log.id}
-                      className="border-l-4 border-blue-500 pl-4 py-2 hover:bg-gray-50"
+                      className="border-l-4 border-blue-500 bg-blue-50 pl-4 py-3 rounded-r-lg hover:bg-blue-100 transition-colors"
                     >
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start mb-1">
                         <span className="font-semibold text-sm text-blue-700">
-                          {log.agentName}
+                          🤖 {log.agentName}
                         </span>
                         <span className="text-xs text-gray-500">
                           {new Date(log.timestamp).toLocaleTimeString()}
@@ -254,7 +297,9 @@ export default function Home() {
                       </div>
                       <p className="text-sm text-gray-700">{log.action}</p>
                       {log.taskId && (
-                        <span className="text-xs text-gray-500">Task: {log.taskId.slice(0, 8)}...</span>
+                        <span className="text-xs text-gray-500 mt-1 inline-block">
+                          Task: {log.taskId.slice(0, 8)}...
+                        </span>
                       )}
                     </div>
                   ))
@@ -265,14 +310,32 @@ export default function Home() {
         </div>
 
         {/* Instructions */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-2">Try These Examples:</h3>
-          <ul className="space-y-1 text-sm">
-            <li>• &quot;Build user authentication&quot; - Watch it decompose into subtasks</li>
-            <li>• &quot;Create a login form&quot; - See focused implementation</li>
-            <li>• &quot;Add API endpoint for users&quot; - Observe code generation</li>
-            <li>• &quot;URGENT: Fix broken button&quot; - Note priority detection</li>
-          </ul>
+        <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-6 shadow-lg">
+          <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
+            <span className="text-xl">💡</span> Try These Examples:
+          </h3>
+          <div className="grid md:grid-cols-2 gap-3">
+            <div className="bg-white rounded-lg p-3 border border-blue-100">
+              <div className="font-semibold text-sm text-blue-700 mb-1">Complex Task</div>
+              <div className="text-sm text-gray-700">&quot;Build user authentication&quot;</div>
+              <div className="text-xs text-gray-500 mt-1">→ Decomposes into 7 subtasks</div>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-purple-100">
+              <div className="font-semibold text-sm text-purple-700 mb-1">Simple Task</div>
+              <div className="text-sm text-gray-700">&quot;Create a login form&quot;</div>
+              <div className="text-xs text-gray-500 mt-1">→ Single focused implementation</div>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-green-100">
+              <div className="font-semibold text-sm text-green-700 mb-1">API Task</div>
+              <div className="text-sm text-gray-700">&quot;Add API endpoint for users&quot;</div>
+              <div className="text-xs text-gray-500 mt-1">→ Code generation demo</div>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-red-100">
+              <div className="font-semibold text-sm text-red-700 mb-1">Priority Detection</div>
+              <div className="text-sm text-gray-700">&quot;URGENT: Fix broken button&quot;</div>
+              <div className="text-xs text-gray-500 mt-1">→ Auto-assigned HIGH priority</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
