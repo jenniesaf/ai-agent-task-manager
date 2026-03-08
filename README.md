@@ -2,13 +2,24 @@
 
 > **A sophisticated multi-agent system demonstrating autonomous task planning and execution**
 
-An advanced exploration of agent-driven architecture where specialized AI agents collaborate to analyze, decompose, and execute tasks autonomously. Built as a learning project to understand multi-agent coordination patterns.
+An advanced exploration of agent-driven **backend architecture** where specialized AI agents collaborate to analyze, decompose, and execute tasks autonomously. This **portfolio project** showcases system design patterns and architectural best practices, not a consumer-facing application. 
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
 
 ---
+
+## 👥 Who Is This For?
+
+**This is NOT a consumer todo app.** This is an **architectural demonstration** for:
+- 🎯 **Developers** exploring multi-agent systems
+- 👔 **Recruiters/Interviewers** evaluating system design skills
+- 🏗️ **Engineers** interested in event-driven architectures
+
+**What you'll see:** Behind-the-scenes of how agents coordinate, not a polished end-user interface.
+
+**Think of it as:** Watching a restaurant kitchen operate, not dining in the restaurant.
 
 ## 🎯 What Makes This Different?
 
@@ -112,6 +123,8 @@ npm run dev
 
 ## 📋 Try These Examples
 
+**How to use:** Type these into the task input and watch the **agent coordination logs** (not typical todo checkboxes).
+
 Watch the agents in action:
 
 | Task Input | Expected Behavior |
@@ -120,6 +133,8 @@ Watch the agents in action:
 | `Create login form` | Single focused implementation task |
 | `Add API endpoint for users` | Breaks into route design, handlers, validation, error handling |
 | `URGENT: Fix broken button` | Detects HIGH priority, routes immediately |
+
+**You'll see:** Real-time logs showing Planning Agent analyzing → decomposing → Implementation Agent executing
 
 ## 🗂️ Project Structure
 
@@ -148,13 +163,13 @@ ai-agent-task-manager/
 └── [config files]
 ```
 
-## 🎓 What I Learned
+## 🎓 Key Technical Concepts
 
-Building this project taught me:
+This project demonstrates:
 
-1. **Multi-Agent Coordination**: How to design loosely-coupled agents that work together
-2. **Event-Driven Architecture**: Using the Observer pattern for scalable communication
-3. **Task Decomposition**: Breaking complex problems into manageable subtasks
+1. **Multi-Agent Coordination**: Designing loosely-coupled agents that work together autonomously
+2. **Event-Driven Architecture**: Implementing the Observer pattern for scalable communication
+3. **Task Decomposition**: Breaking complex problems into manageable subtasks algorithmically
 4. **State Management**: Tracking distributed agent states and task lifecycles
 5. **Real-Time Systems**: Building responsive UIs that reflect agent activity
 
@@ -191,16 +206,26 @@ Building this project taught me:
 - [agents/planning-agent/SPECIFICATION.md](agents/planning-agent/SPECIFICATION.md) - Planning Agent spec
 - [agents/implementation-agent/SPECIFICATION.md](agents/implementation-agent/SPECIFICATION.md) - Implementation Agent spec
 
-## 🤝 About
+## 🤝 About This Project
 
-Built as a learning project to explore agent-driven development patterns. This project demonstrates:
-- How to design autonomous agent systems
-- Event-driven communication patterns
-- Task decomposition strategies
+**Purpose:** This **portfolio project** demonstrates advanced backend architecture and system design patterns, not a production app for end users.
+
+**What it demonstrates:**
+- Autonomous agent system design
+- Event-driven communication patterns (Observer pattern)
+- Intelligent task decomposition strategies
 - Real-time monitoring and observability
+- Loose coupling and scalability principles
+
+**What it's NOT:**
+- ❌ A polished todo app for consumers
+- ❌ Full CRUD app with user authentication
+- ❌ Production-ready for deployment
+
+**The Value:** Demonstrates architectural thinking and system design skills relevant to building AI-powered backend systems.
 
 ---
 
 **Author**: Jennie Safronov  
-**Purpose**: Learning & Portfolio Project  
+**Type**: Portfolio Project  
 **License**: MIT
