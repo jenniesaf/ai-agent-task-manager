@@ -27,12 +27,67 @@ export default function Home() {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [systemStatus, setSystemStatus] = useState<any>(null);
+  const [lastLogId, setLastLogId] = useState<string>('');
 
   useEffect(() => {
     fetchData();
+    // Welcome message for browser console
+    console.log('%c🤖 AI Agent Task Manager', 'color: #3b82f6; font-size: 20px; font-weight: bold');
+    console.log('%cAgent activity will be logged here in real-time', 'color: #6b7280; font-style: italic');
+    console.log('%cCreate a task to see the agents in action!', 'color: #8b5cf6; font-weight: bold');
+    console.log('---');
+    
     const interval = setInterval(fetchData, 2000); // Refresh every 2 seconds
     return () => clearInterval(interval);
   }, []);
+
+  // Browser console logging for agent activity
+  useEffect(() => {
+    if (logs.length > 0) {
+      const latestLog = logs[logs.length - 1];
+      if (latestLog.id !== lastLogId) {
+        const emoji = latestLog.agentName.includes('Planning') ? '📋' : '⚙️';
+        console.log(`%c${emoji} ${latestLog.agentName}%c | ${latestLog.action}`, 
+          'color: #3b82f6; font-weight: bold', 
+          'color: #6b7280');
+        setLastLogId(latestLog.id);
+      }
+    }
+  }, [logs, lastLogId]);
+
+  // Log task status changes
+  useEffect(() => {
+    tasks.forEach(task => {
+      const statusEmoji = {
+        pending: '⏳',
+        analyzing: '🔍',
+        ready: '📌',
+        in_progress: '⚡',
+        completed: '✅',
+        failed: '❌',
+        blocked: '🚫'
+      }[task.status] || '📝';
+      
+      if (task.status === 'analyzing' || task.status === 'in_progress') {
+        console.log(`%c${statusEmoji} Task Status%c | "${task.title}" → ${task.status}`, 
+          'color: #8b5cf6; font-weight: bold', 
+          'color: #6b7280');
+      } else if (task.status === 'completed') {
+        console.log(`%c✅ Task Completed%c | "${task.title}"`, 
+          'color: #10b981; font-weight: bold', 
+          'color: #6b7280');
+      }
+    });
+  }, [tasks]);
+
+  // Log system status
+  useEffect(() => {
+    if (systemStatus?.agentStats?.byStatus?.busy > 0) {
+      console.log(`%c🤖 System%c | ${systemStatus.agentStats.byStatus.busy} agent(s) working`, 
+        'color: #10b981; font-weight: bold', 
+        'color: #6b7280');
+    }
+  }, [systemStatus?.agentStats?.byStatus?.busy]);
 
   const fetchData = async () => {
     try {
@@ -95,6 +150,10 @@ export default function Home() {
     return colors[status] || 'bg-gray-100 text-gray-700';
   };
 
+  const isTaskActive = (status: string) => {
+    return ['analyzing', 'ready', 'in_progress'].includes(status);
+  };
+
   const getPriorityColor = (priority: string) => {
     const colors: Record<string, string> = {
       HIGH: 'bg-red-100 text-red-700 border border-red-300',
@@ -125,6 +184,25 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-8">
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        .spinner {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border: 2px solid currentColor;
+          border-right-color: transparent;
+          border-radius: 50%;
+          animation: spin 0.75s linear infinite;
+        }
+        .spinner-lg {
+          width: 16px;
+          height: 16px;
+          border-width: 3px;
+        }
+      `}</style>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -167,8 +245,11 @@ export default function Home() {
               </div>
               <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
                 <div className="text-sm text-gray-600 mb-1">Busy Agents</div>
-                <div className="text-3xl font-bold text-purple-600">
+                <div className="text-3xl font-bold text-purple-600 flex items-center">
                   {systemStatus.agentStats?.byStatus?.busy || 0}
+                  {(systemStatus.agentStats?.byStatus?.busy || 0) > 0 && (
+                    <span className="spinner spinner-lg text-purple-500" style={{ marginLeft: '8px' }}></span>
+                  )}
                 </div>
               </div>
               <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4">
@@ -252,7 +333,10 @@ export default function Home() {
                         <p className="text-sm text-gray-600 mb-3">{task.description}</p>
                       )}
                       <div className="flex gap-2 flex-wrap">
-                        <span className={`text-xs px-3 py-1 rounded-full font-medium ${getStatusColor(task.status)}`}>
+                        <span className={`text-xs px-3 py-1 rounded-full font-medium flex items-center ${getStatusColor(task.status)}`}>
+                          {isTaskActive(task.status) && (
+                            <span className="spinner" style={{ marginRight: '6px' }}></span>
+                          )}
                           {task.status}
                         </span>
                         {task.assignedToAgent && (
@@ -273,6 +357,9 @@ export default function Home() {
             <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 <span className="text-2xl">🔄</span> Agent Activity
+                {systemStatus?.agentStats?.byStatus?.busy > 0 && (
+                  <span className="spinner spinner-lg text-blue-500" style={{ marginLeft: '8px' }}></span>
+                )}
               </h2>
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {logs.length === 0 ? (

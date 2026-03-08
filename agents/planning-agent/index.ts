@@ -13,6 +13,16 @@ import { dataStore, eventBus, agentRegistry, getTimestamp } from '@/lib';
 import { analyzeTask, isTaskClear, shouldDecompose } from './task-analyzer';
 import { decomposeTask, optimizeSubtaskPriorities } from './task-decomposer';
 
+// Configuration: Delays for demo visibility (in milliseconds)
+const DEMO_DELAYS = {
+  ANALYSIS: 1500,        // Time to analyze a task
+  DECOMPOSITION: 1500,   // Time to decompose into subtasks
+  BETWEEN_SUBTASKS: 800, // Pause between assigning subtasks
+};
+
+// Helper function for delays
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export class PlanningAgent implements IAgent {
   public readonly id: string;
   public readonly name: string;
@@ -45,6 +55,7 @@ export class PlanningAgent implements IAgent {
    */
   async processTask(task: Task): Promise<PlanningResult> {
     this.log(`Processing task: ${task.title}`, task.id);
+    console.log(`\n[${this.name}] 📋 PROCESSING | Task: "${task.title}" | ID: ${task.id.slice(0, 8)}`);
     this.setStatus('busy', task.id);
 
     try {
@@ -55,8 +66,13 @@ export class PlanningAgent implements IAgent {
         taskId: task.id,
       });
 
-      // Analyze the task
+      // Analyze the task (with delay for demo visibility)
+      this.log('Analyzing task...', task.id);
+      console.log(`[${this.name}] 🔍 ANALYZING | Running task analysis...`);
+      await delay(DEMO_DELAYS.ANALYSIS);
+      
       const analysis = await this.analyze(task);
+      console.log(`[${this.name}] ✓ ANALYSIS COMPLETE | Type: ${analysis.taskType} | Complexity: ${analysis.complexity} | Decompose: ${analysis.requiresDecomposition}`);
       this.log(`Task analysis complete. Type: ${analysis.taskType}, Complexity: ${analysis.complexity}`, task.id);
 
       // Check if task needs clarification
@@ -96,11 +112,6 @@ export class PlanningAgent implements IAgent {
    * Analyze a task to understand its characteristics
    */
   private async analyze(task: Task): Promise<TaskAnalysis> {
-    this.log('Analyzing task...', task.id);
-    
-    // Simulate thinking time
-    await this.simulateThinking(500);
-    
     const analysis = analyzeTask(task);
     
     // Apply suggested priority if task doesn't have explicit priority
@@ -116,14 +127,19 @@ export class PlanningAgent implements IAgent {
    */
   private async decomposeAndPlan(task: Task, analysis: TaskAnalysis): Promise<PlanningResult> {
     this.log('Decomposing task into subtasks...', task.id);
+    console.log(`[${this.name}] 🔨 DECOMPOSING | Breaking down complex task...`);
     
-    // Simulate planning time
-    await this.simulateThinking(800);
+    // Decomposition thinking time (for demo visibility)
+    await delay(DEMO_DELAYS.DECOMPOSITION);
     
     // Get subtask definitions
     let subtaskDefs = decomposeTask(task);
     subtaskDefs = optimizeSubtaskPriorities(subtaskDefs);
     
+    console.log(`[${this.name}] ✓ DECOMPOSED | Created ${subtaskDefs.length} subtasks`);
+    subtaskDefs.forEach((st, idx) => {
+      console.log(`  ${idx + 1}. [${st.priority}] ${st.title}`);
+    });
     this.log(`Created ${subtaskDefs.length} subtasks`, task.id);
     
     // Create actual task entries for subtasks
@@ -155,6 +171,7 @@ export class PlanningAgent implements IAgent {
     // Assign first subtask
     if (createdSubtasks.length > 0) {
       const firstSubtask = createdSubtasks[0];
+      console.log(`[${this.name}] 🎯 ASSIGNING | First subtask: "${firstSubtask.title}"`);
       await this.assignToImplementation(firstSubtask);
     }
     
@@ -205,10 +222,12 @@ export class PlanningAgent implements IAgent {
     
     if (!implAgent) {
       this.log('No implementation agent available, task will wait', task.id);
+      console.log(`[${this.name}] ⏸️  WAITING | No implementation agent available for "${task.title}"`);
       dataStore.updateTaskStatus(task.id, 'ready');
       return;
     }
     
+    console.log(`[${this.name}] → ASSIGNING | Task "${task.title}" to ${implAgent.name}`);
     this.log(`Assigning task to ${implAgent.name}`, task.id);
     dataStore.updateTaskStatus(task.id, 'ready', implAgent.id);
     
@@ -232,8 +251,21 @@ export class PlanningAgent implements IAgent {
         const nextTask = siblings.find(t => t.status === 'pending');
         
         if (nextTask) {
+          const completedCount = siblings.filter(t => t.status === 'completed').length;
+          const totalCount = siblings.length;
+          console.log(`[${this.name}] 🔄 PROGRESS | Subtask ${completedCount}/${totalCount} completed. Next: "${nextTask.title}"`);
           this.log(`Subtask completed, assigning next: ${nextTask.title}`, nextTask.id);
+          
+          // Pause between subtasks (for demo visibility)
+          await delay(DEMO_DELAYS.BETWEEN_SUBTASKS);
+          
           await this.assignToImplementation(nextTask);
+        } else {
+          const completedCount = siblings.filter(t => t.status === 'completed').length;
+          const totalCount = siblings.length;
+          if (completedCount === totalCount) {
+            console.log(`[${this.name}] ✅ ALL COMPLETE | All ${totalCount} subtasks finished!`);
+          }
         }
       }
     }
