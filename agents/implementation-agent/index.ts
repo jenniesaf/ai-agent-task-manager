@@ -74,13 +74,16 @@ export class ImplementationAgent implements IAgent {
 
       // Mark as completed
       dataStore.updateTaskStatus(task.id, 'completed', this.id);
+      
+      // Set status to idle BEFORE emitting event so other agents can pick up new work
+      this.setStatus('idle');
+      
       await eventBus.emit('task.completed', {
         agentId: this.id,
         taskId: task.id,
       });
 
       const result = this.createResult(task.id, 'completed', logs, startTime, undefined, output);
-      this.setStatus('idle');
       
       this.log(`Task completed successfully: ${task.title}`, task.id);
       return result;
